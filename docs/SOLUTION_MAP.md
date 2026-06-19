@@ -27,7 +27,7 @@ flowchart LR
 
 ## Componentes
 
-- `Tu_Partner_TI_Workflow_A_Ideador_V2.json`: obtiene noticias, genera el contenido y crea filas en estado `REVISANDO`.
+- `Workflow_A_Ideador_Empresa.json`: obtiene noticias, genera el contenido y crea filas en estado `REVISANDO`.
 - `Workflow_B_Publicador_LinkedIn.json`: publicador principal; enruta a perfil u organización usando `Destino LinkedIn`.
 - `Workflow_B_Publicador_LinkedIn_Organizacion.json`: variante independiente de compatibilidad para una organización configurada por el usuario.
 - Google Sheets: base operativa y punto de aprobación humana.
@@ -51,5 +51,5 @@ Una vez generado `graphify-out/graph.json`:
 graphify query "¿Cómo llega una noticia hasta LinkedIn?"
 graphify query "¿Qué componentes dependen de Google Sheets?"
 graphify affected "Workflow_B_Publicador_LinkedIn_Organizacion.json"
-graphify path "Tu_Partner_TI_Workflow_A_Ideador_V2.json" "LinkedIn"
+graphify path "Workflow_A_Ideador_Empresa.json" "LinkedIn"
 ```
