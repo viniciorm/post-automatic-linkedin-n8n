@@ -1,0 +1,551 @@
+{
+  "name": "Tu Partner TI - Workflow Personal (Ideador y Publicador)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hour"
+            }
+          ]
+        }
+      },
+      "id": "54a41b69-7117-4631-a3de-bda8852102c4",
+      "name": "Cada hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ideas Personales",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "43220278-9dae-4a1d-99aa-6a7c7f238137",
+      "name": "Leer ideas para generar",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        176
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_OAUTH2API_CREDENTIAL_ID",
+          "name": "googleSheetsOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.filter(({ json }) =>\n  String(json.Estado ?? '').trim().toUpperCase() === 'GENERAR' &&\n  String(json['Idea Base'] ?? '').trim().length > 0\n);"
+      },
+      "id": "de794c04-2f6b-4a76-b632-4559db52ad15",
+      "name": "Filtrar ideas GENERAR",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const system = `Eres el asistente editorial de Vini Reyes para LinkedIn. Debes escribir como él, no como una agencia ni como una marca corporativa.\n\nPERFIL DE VOZ:\n- Profesional tecnológico chileno, autodidacta, curioso y orientado a la aplicación práctica de la IA.\n- Tono cercano, reflexivo, optimista y didáctico; nunca grandilocuente.\n- Conecta la tecnología con oportunidades reales para Chile, Latinoamérica, pymes, educación, empleabilidad y colaboración.\n- Explica primero el contexto y luego entrega una opinión personal razonada.\n- Usa primera persona cuando exista una opinión o experiencia entregada por Vini.\n- Puede usar transiciones naturales como: Lo que más me llamó la atención, Más allá de, Para mí, Creo que, Lo comparto porque. No las fuerces ni las repitas en todos los posts.\n- Prefiere párrafos breves, pero desarrolla las ideas con calma. Puede usar listas cuando ayudan a ordenar información concreta.\n- Cierra con una pregunta genuina, una reflexión abierta o una invitación a conversar.\n\nREGLAS:\n- No inventes experiencias, opiniones, cifras, credenciales ni vínculos personales.\n- Si el campo Experiencia está vacío, no escribas he visto, me ha pasado ni afirmaciones equivalentes.\n- Conserva los datos concretos entregados en la idea o referencia.\n- Evita clichés como lleva tu negocio al siguiente nivel, en el mundo digital actual, revolucionario, game changer o la IA llegó para quedarse.\n- Evita tono de vendedor, frases excesivamente cortas, dramatización, clickbait y preguntas retóricas encadenadas.\n- No conviertas todo en una promoción de Tu Partner TI. Menciónala sólo cuando sea parte real de la idea.\n- Extensión orientativa: 180 a 320 palabras; puede ser más breve si se trata de una invitación o recurso.\n- Usa emojis sólo cuando organicen información o aporten contexto, nunca como decoración.\n- Usa entre 3 y 7 hashtags relevantes al final, sin escribir la palabra hashtag.\n- Devuelve únicamente JSON válido con las claves copy y visual_prompt, sin Markdown.\n- El visual_prompt debe estar en inglés, describir una imagen editorial y no incluir texto ni logotipos.\n\nESTRUCTURA ORIENTATIVA:\n1. Apertura contextual, contraste u observación concreta.\n2. Explicación clara de la idea, noticia o experiencia.\n3. Lectura personal sobre por qué importa.\n4. Consecuencia práctica para personas, organizaciones o Latinoamérica.\n5. Cierre abierto y natural.`;\n\nconst generatedAt = Date.now();\nreturn items.map(({ json }, index) => {\n  const currentId = String(json.ID ?? '').trim();\n  const row = json.row_number ?? index + 2;\n  return {\n    json: {\n      ...json,\n      ID: currentId || `P-${generatedAt}-${row}`,\n      groqBody: {\n        model: 'llama-3.3-70b-versatile',\n        temperature: 0.55,\n        messages: [\n          { role: 'system', content: system },\n          { role: 'user', content: `Idea base: ${json['Idea Base'] ?? ''}\\nMi opinión: ${json['Mi Opinion'] ?? ''}\\nExperiencia o contexto personal: ${json.Experiencia ?? ''}\\nObjetivo del post: ${json.Objetivo ?? ''}\\nEnlace o referencia: ${json['Link Referencia'] ?? ''}` }\n        ]\n      }\n    }\n  };\n});"
+      },
+      "id": "1d911116-372a-4ef7-b3c0-df9623d2d32f",
+      "name": "Preparar prompt personal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.groqBody) }}",
+        "options": {}
+      },
+      "id": "07114a0a-0300-49b9-be46-3066377dcf0a",
+      "name": "Generar copy personal con Groq",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        384
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "YOUR_GROQ_API_CREDENTIAL_ID",
+          "name": "groqApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const content = String($json.choices?.[0]?.message?.content ?? '').trim();\nconst clean = content.replace(/^```json\\s*/i, '').replace(/```$/i, '').trim();\nconst parsed = JSON.parse(clean);\n\nconst formatForLinkedIn = (value) => {\n  const source = String(value ?? '').replace(/\\r\\n/g, '\\n').trim();\n  if (!source) return '';\n\n  const result = [];\n  const sourceParagraphs = source.split(/\\n\\s*\\n/).map((part) => part.replace(/\\s+/g, ' ').trim()).filter(Boolean);\n\n  for (const paragraph of sourceParagraphs) {\n    if (/^(?:#\\S+\\s*)+$/.test(paragraph)) {\n      result.push(paragraph);\n      continue;\n    }\n\n    const sentences = paragraph.match(/.*?(?:[.!?]+(?=\\s|$)|$)/g)?.map((sentence) => sentence.trim()).filter(Boolean) ?? [paragraph];\n    let group = [];\n\n    const flush = () => {\n      if (group.length) result.push(group.join(' '));\n      group = [];\n    };\n\n    for (const sentence of sentences) {\n      const isQuestion = sentence.startsWith('¿');\n      const nextLength = [...group, sentence].join(' ').length;\n\n      if (isQuestion) {\n        flush();\n        result.push(sentence);\n      } else {\n        if (group.length >= 2 || nextLength > 220) flush();\n        group.push(sentence);\n      }\n    }\n\n    flush();\n  }\n\n  return result.join('\\n\\n').replace(/\\n{3,}/g, '\\n\\n').trim();\n};\n\nreturn [{ json: { copy: formatForLinkedIn(parsed.copy), visual_prompt: parsed.visual_prompt } }];"
+      },
+      "id": "9484d23f-6bd0-48b2-a4bc-9dca10c8d7f3",
+      "name": "Parsear copy personal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ideas Personales",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Filtrar ideas GENERAR').item.json.row_number }}",
+            "ID": "={{ $('Preparar prompt personal').item.json.ID }}",
+            "Copy Personal": "={{ $json.copy }}",
+            "Prompt Visual": "={{ $json.visual_prompt }}",
+            "Estado": "REVISANDO"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "3df77661-2c27-41c8-904a-b699f47b85da",
+      "name": "Guardar borrador personal",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        912,
+        176
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_OAUTH2API_CREDENTIAL_ID",
+          "name": "googleSheetsOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ideas Personales",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "1998b794-d672-42e2-9628-1da156019826",
+      "name": "Leer ideas aprobadas",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        544
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_OAUTH2API_CREDENTIAL_ID",
+          "name": "googleSheetsOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Santiago', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());\nconst date = Object.fromEntries(parts.map(({ type, value }) => [type, value]));\nconst today = `${date.year}-${date.month}-${date.day}`;\nconst formats = new Set(['TEXTO', 'IMAGEN']);\n\nconst normalizeDate = (value) => {\n  const raw = String(value ?? '').trim();\n  const local = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n\n  if (local) {\n    const [, day, month, year] = local;\n    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;\n  }\n\n  return raw.slice(0, 10);\n};\n\nreturn items.filter(({ json }) =>\n  String(json.Estado ?? '').trim().toUpperCase() === 'APROBADO' &&\n  normalizeDate(json['Fecha Publicacion']) === today &&\n  formats.has(String(json.Formato ?? '').trim().toUpperCase()) &&\n  String(json['Copy Personal'] ?? '').trim().length > 0\n);"
+      },
+      "id": "f2bac67c-c112-4c54-b971-0c28389bbb47",
+      "name": "Filtrar ideas APROBADAS",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0ba79000-3710-4bc1-ab47-9f24021fa407",
+                    "leftValue": "={{ $json.Formato.toUpperCase() }}",
+                    "rightValue": "TEXTO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "TEXTO"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9fc9dd4d-7823-4520-a66f-27d9ea8254a5",
+                    "leftValue": "={{ $json.Formato.toUpperCase() }}",
+                    "rightValue": "IMAGEN",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "IMAGEN"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b540b992-662e-48c7-abd6-50975be2e221",
+      "name": "Elegir formato",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "person": "qMfOoqmm1d",
+        "text": "={{ $('Filtrar ideas APROBADAS').item.json['Copy Personal'] }}",
+        "additionalFields": {}
+      },
+      "id": "c97f6c00-56f0-4c55-a0d3-d8c489b55d7c",
+      "name": "Publicar texto personal",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        912,
+        480
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKED_IN_OAUTH2API_CREDENTIAL_ID",
+          "name": "linkedInOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "huggingFaceApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "image/jpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\"inputs\": $json[\"Prompt Visual\"]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "151a9488-20a9-4a63-b466-f9eeab4c708c",
+      "name": "Generar imagen personal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        912,
+        624
+      ],
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "YOUR_HUGGING_FACE_API_CREDENTIAL_ID",
+          "name": "huggingFaceApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "qMfOoqmm1d",
+        "text": "={{ $('Filtrar ideas APROBADAS').item.json['Copy Personal'] }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "b9c8b0a5-d4eb-4ae0-9852-dd7e9a098afc",
+      "name": "Publicar imagen personal",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        624
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKED_IN_OAUTH2API_CREDENTIAL_ID",
+          "name": "linkedInOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Ideas Personales",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Filtrar ideas APROBADAS').item.json.ID }}",
+            "Estado": "PUBLICADO"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e571dc98-e248-408c-ac71-f40537d75877",
+      "name": "Marcar personal PUBLICADO",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1360,
+        544
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_OAUTH2API_CREDENTIAL_ID",
+          "name": "googleSheetsOAuth2Api credential"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cada hora": {
+      "main": [
+        [
+          {
+            "node": "Leer ideas para generar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Leer ideas aprobadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer ideas para generar": {
+      "main": [
+        [
+          {
+            "node": "Filtrar ideas GENERAR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar ideas GENERAR": {
+      "main": [
+        [
+          {
+            "node": "Preparar prompt personal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar prompt personal": {
+      "main": [
+        [
+          {
+            "node": "Generar copy personal con Groq",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar copy personal con Groq": {
+      "main": [
+        [
+          {
+            "node": "Parsear copy personal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear copy personal": {
+      "main": [
+        [
+          {
+            "node": "Guardar borrador personal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer ideas aprobadas": {
+      "main": [
+        [
+          {
+            "node": "Filtrar ideas APROBADAS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar ideas APROBADAS": {
+      "main": [
+        [
+          {
+            "node": "Elegir formato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Elegir formato": {
+      "main": [
+        [
+          {
+            "node": "Publicar texto personal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generar imagen personal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar imagen personal": {
+      "main": [
+        [
+          {
+            "node": "Publicar imagen personal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar texto personal": {
+      "main": [
+        [
+          {
+            "node": "Marcar personal PUBLICADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar imagen personal": {
+      "main": [
+        [
+          {
+            "node": "Marcar personal PUBLICADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santiago"
+  },
+  "pinData": {},
+  "tags": []
+}

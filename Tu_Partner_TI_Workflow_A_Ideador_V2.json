@@ -1,0 +1,515 @@
+{
+  "name": "Tu Partner TI - Workflow A (Ideador_V2)",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_SPREADSHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "ID",
+              "fieldValue": "={{ $now.toFormat('yyyyMMddHHmmssSSS') }}"
+            },
+            {
+              "fieldId": "Etapa Funnel",
+              "fieldValue": "={{ $json.funnel }}"
+            },
+            {
+              "fieldId": "Tema / Título",
+              "fieldValue": "={{ $json.titulo }}"
+            },
+            {
+              "fieldId": "RRSS",
+              "fieldValue": "LinkedIn"
+            },
+            {
+              "fieldId": "Destino LinkedIn",
+              "fieldValue": "Organizacion"
+            },
+            {
+              "fieldId": "Tipo de Post",
+              "fieldValue": "POST"
+            },
+            {
+              "fieldId": "Copy Sugerido",
+              "fieldValue": "={{ $json.copy }}"
+            },
+            {
+              "fieldId": "Prompt Visual",
+              "fieldValue": "={{ $json.visual_prompt }}"
+            },
+            {
+              "fieldId": "CTA",
+              "fieldValue": "={{ $json.cta }}"
+            },
+            {
+              "fieldId": "Fecha Publicacion",
+              "fieldValue": ""
+            },
+            {
+              "fieldId": "Estado",
+              "fieldValue": "REVISANDO"
+            },
+            {
+              "fieldId": "Link Noticia",
+              "fieldValue": "={{ $json.link }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        896,
+        112
+      ],
+      "id": "e864cc28-095a-4545-96de-d83e63b084db",
+      "credentials": {
+        "googleApi": {
+          "id": "YOUR_GOOGLE_API_CREDENTIAL_ID",
+          "name": "googleApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        544,
+        112
+      ],
+      "id": "01961fe9-2e81-4fb4-ad14-62bd8e9715ad",
+      "name": "Groq Chat Model",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "groqApi": {
+          "id": "YOUR_GROQ_API_CREDENTIAL_ID",
+          "name": "groqApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Actúa como editor senior de Tu Partner TI. Convierte la noticia en una publicación de LinkedIn que aporte criterio, demuestre experiencia y, cuando corresponda, abra una oportunidad comercial sin sonar como un anuncio.\n\nVOZ DE TU PARTNER TI:\n- Profesional, clara, cercana y con criterio técnico.\n- Explica la tecnología desde su impacto real en personas, equipos y organizaciones.\n- Habla como un partner que ayuda a tomar mejores decisiones, no como una agencia que persigue una venta.\n- No inventes proyectos, clientes, resultados, cifras, experiencias ni capacidades que no estén respaldadas.\n- Evita grandilocuencia, miedo, clickbait y clichés como llevar tu negocio al siguiente nivel, solución revolucionaria, en la era digital o la tecnología llegó para quedarse.\n\nCLASIFICACIÓN DEL FUNNEL:\n- TOFU: noticia o tendencia general. El objetivo es informar, contextualizar y despertar interés. No ofrezcas servicios.\n- MOFU: la noticia revela un problema, decisión, riesgo u oportunidad que una organización debería evaluar. Entrega criterios prácticos y muestra cómo abordar el tema. Puedes invitar a revisar la situación del lector.\n- BOFU: existe una necesidad concreta y directamente relacionada con acompañamiento tecnológico, transformación digital, producto, innovación o IA aplicada. Explica de forma clara cómo Tu Partner TI puede ayudar e invita a conversar, sin presión ni promesas exageradas.\n- No elijas TOFU por defecto. Decide según la intención y la cercanía del tema con una decisión real de negocio. Tampoco fuerces MOFU o BOFU cuando la noticia no lo permite.\n\nFORMATO OBLIGATORIO PARA LINKEDIN:\n- Sólo LinkedIn; siempre un POST. No escribas para Instagram ni menciones reels, historias o carruseles.\n- Entre 160 y 260 palabras, salvo que la noticia no entregue información suficiente.\n- Apertura con una observación concreta, no con una frase sensacionalista.\n- Usa entre 5 y 8 párrafos breves, separados mediante \\n\\n dentro del valor JSON. Nunca entregues un bloque continuo.\n- Desarrolla una sola idea principal: contexto, por qué importa, lectura de Tu Partner TI y consecuencia práctica.\n- Máximo dos emojis y sólo si ayudan a organizar.\n- Entre 3 y 5 hashtags específicos al final, en una línea separada.\n\nCTA Y VENTA:\n- Incluye un único cierre dentro del copy y devuelve exactamente ese cierre también en cta.\n- El cierre debe nacer del tema y variar entre publicaciones. No repitas fórmulas como ¿Qué opinas?, Hablemos o Contáctanos.\n- TOFU: pregunta específica o invitación a compartir una experiencia; sin venta.\n- MOFU: invitación suave a evaluar una práctica, riesgo o decisión concreta.\n- BOFU: propuesta directa y sobria, por ejemplo conversar, revisar un caso o realizar un diagnóstico; indica qué ayuda puede ofrecer Tu Partner TI.\n- La venta debe sentirse como el siguiente paso lógico después de entregar valor, no como una interrupción.\n\nIMAGEN:\n- Escribe el valor completo de visual_prompt exclusivamente en inglés. No incluyas palabras ni instrucciones en español.\n- Si la fuente contiene conceptos en español, tradúcelos al inglés en vez de copiarlos literalmente.\n- Redacta entre 60 y 100 palabras con suficiente detalle para un generador de imágenes.\n- Describe el sujeto principal, la composición, el entorno, la iluminación, el estilo fotográfico o editorial y la paleta de color.\n- La imagen debe ser estática, profesional y adecuada para el feed de LinkedIn.\n- No solicites texto, letras, números, subtítulos, marcas de agua, interfaces legibles ni logotipos reales o inventados.\n- Identidad visual: deep blue #003366, white, subtle cyan accents and a professional technology aesthetic.\n\nSALIDA:\nDevuelve únicamente JSON válido, sin Markdown ni comentarios adicionales, con esta estructura exacta:\n{\n  \"funnel\": \"TOFU, MOFU o BOFU\",\n  \"titulo\": \"Título profesional con gancho creíble\",\n  \"copy\": \"Publicación completa con párrafos y cierre incorporado\",\n  \"visual_prompt\": \"Detailed English prompt for a static editorial image, written entirely in English\",\n  \"cta\": \"El mismo cierre utilizado dentro del copy\"\n}\n\nFUENTE:\nTítulo: {{ $json.title }}\nResumen: {{ $json.contentSnippet }}\nEnlace: {{ $json.link }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        544,
+        -96
+      ],
+      "id": "18c4ca8c-a6dc-4121-947c-fc1183f13abd",
+      "name": "AI Agent",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 12 * * 1-7"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -448,
+        32
+      ],
+      "id": "08c4b3f6-9235-48cb-9943-6c25753173b3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://techcrunch.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -112
+      ],
+      "id": "7cf1ae07-bf38-4661-aafd-fa5b50dddde9",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "url": "https://www.wired.com/feed/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        32
+      ],
+      "id": "d6acabd0-67bb-4ee1-b1ac-3f1221971b59",
+      "name": "RSS Read1"
+    },
+    {
+      "parameters": {
+        "url": "https://www.theverge.com/rss/index.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        192
+      ],
+      "id": "9c2180fc-a9f2-481d-b2da-dc48c7b128f9",
+      "name": "RSS Read2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        128,
+        32
+      ],
+      "id": "0225dc42-0ba1-465f-9d9d-27f149470094",
+      "name": "Loop Over Items",
+      "executeOnce": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        304,
+        48
+      ],
+      "id": "30b949b5-4156-4ec3-9790-391aef1d1582"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        112
+      ],
+      "id": "7df6ec1c-2853-4c96-9312-8ac150429dac",
+      "name": "Wait",
+      "webhookId": "7a829fcf-2361-48f6-afdb-e8e00df2df26"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -64,
+        16
+      ],
+      "id": "a0216d72-037a-48af-bc09-73acf8b857df",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const funnelTargets = ['TOFU', 'MOFU', 'BOFU'];\nconst funnelInstructions = {\n  TOFU: 'Informa y contextualiza. No ofrezcas servicios. Cierra con una pregunta específica sobre la noticia.',\n  MOFU: 'Convierte la noticia en criterios para evaluar una decisión, riesgo u oportunidad. Usa una invitación comercial suave.',\n  BOFU: 'Relaciona la noticia con una necesidad concreta que Tu Partner TI pueda resolver. Explica la ayuda de forma directa y sobria.'\n};\nconst keywords = ['ai', 'artificial intelligence', 'cyber', 'security', 'cloud', 'software', 'data', 'digital', 'automation', 'startup', 'product', 'innovation', 'technology', 'robot', 'blockchain', 'fintech', 'infrastructure'];\n\nconst candidates = items.map((item, index) => {\n  const text = `${item.json.title ?? ''} ${item.json.contentSnippet ?? ''}`.toLowerCase();\n  const score = keywords.reduce((total, keyword) => total + (text.includes(keyword) ? 1 : 0), 0);\n  const timestamp = Date.parse(item.json.isoDate ?? item.json.pubDate ?? '') || 0;\n  const domain = String(item.json.link ?? '').match(/^https?:\\/\\/([^/]+)/i)?.[1]?.replace(/^www\\./, '') ?? `unknown-${index}`;\n  return { item, index, score, timestamp, domain };\n}).filter((candidate) => candidate.score > 0);\n\ncandidates.sort((a, b) => b.score - a.score || b.timestamp - a.timestamp || a.index - b.index);\n\nconst selected = [];\nconst usedDomains = new Set();\nfor (const candidate of candidates) {\n  if (!usedDomains.has(candidate.domain)) {\n    selected.push(candidate);\n    usedDomains.add(candidate.domain);\n  }\n  if (selected.length === 3) break;\n}\n\nfor (const candidate of candidates) {\n  if (selected.length === 3) break;\n  if (!selected.includes(candidate)) selected.push(candidate);\n}\n\nreturn selected.map(({ item }, index) => {\n  const funnelTarget = funnelTargets[index];\n  const originalSnippet = String(item.json.contentSnippet ?? item.json.content ?? '').replace(/\\s+/g, ' ').trim().slice(0, 1800);\n  return {\n    json: {\n      ...item.json,\n      funnel_target: funnelTarget,\n      original_content_snippet: originalSnippet,\n      contentSnippet: `${originalSnippet}\\n\\nINSTRUCCIÓN EDITORIAL OBLIGATORIA: genera este post como ${funnelTarget}. ${funnelInstructions[funnelTarget]}`\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        -128
+      ],
+      "id": "6f54f0c8-22a4-4b84-90d2-2ad9b90f9481",
+      "name": "Seleccionar lote editorial"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = String($json.output ?? $json.choices?.[0]?.message?.content ?? '').trim();\nconst jsonMatch = raw.match(/\\{[\\s\\S]*\\}/);\nif (!jsonMatch) throw new Error('La IA no devolvió un objeto JSON. No se escribirá ninguna fila incompleta.');\n\nlet parsed;\ntry {\n  parsed = JSON.parse(jsonMatch[0]);\n} catch (error) {\n  throw new Error(`JSON inválido devuelto por la IA: ${error.message}`);\n}\n\nconst source = $('Replace Me').item.json;\nconst target = String(source.funnel_target ?? parsed.funnel ?? '').trim().toUpperCase();\nconst trailing = raw.slice((jsonMatch.index ?? 0) + jsonMatch[0].length).replace(/```/g, '').trim();\nconst externalHashtags = trailing.match(/(?:#\\S+\\s*){2,}/)?.[0]?.trim() ?? '';\nlet copy = String(parsed.copy ?? '').trim();\nif (externalHashtags && !/#\\S+/.test(copy)) copy = `${copy}\\n\\n${externalHashtags}`;\n\nconst result = {\n  ...source,\n  generation_provider: $json.choices?.[0]?.message?.content ? 'OpenAI fallback' : 'Groq',\n  funnel: target,\n  titulo: String(parsed.titulo ?? '').trim(),\n  copy,\n  visual_prompt: String(parsed.visual_prompt ?? '').trim(),\n  cta: String(parsed.cta ?? '').trim()\n};\n\nconst missing = ['funnel', 'titulo', 'copy', 'visual_prompt', 'cta'].filter((field) => !result[field]);\nif (missing.length) throw new Error(`Respuesta incompleta de la IA. Faltan: ${missing.join(', ')}. No se escribirá la fila.`);\nif (!['TOFU', 'MOFU', 'BOFU'].includes(result.funnel)) throw new Error(`Funnel inválido: ${result.funnel}`);\n\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        -96
+      ],
+      "id": "f4587184-75a4-463e-a2c2-47aef0563ed5",
+      "name": "Validar respuesta IA"
+    },
+    {
+      "parameters": {
+        "jsCode": "const errorText = JSON.stringify($json);\nif (!/(too many requests|rate limit|429|quota|tokens per day|tpd)/i.test(errorText)) {\n  throw new Error(`Groq falló por una causa que no autoriza contingencia: ${errorText.slice(0, 500)}`);\n}\n\nreturn [{\n  json: {\n    ...$('Replace Me').item.json,\n    groq_error: errorText.slice(0, 1500)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        96
+      ],
+      "id": "1da60d72-ee25-49e4-81cb-034412fed458",
+      "name": "Autorizar contingencia OpenAI"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4.1-mini', temperature: 0.5, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: 'Eres el editor senior de Tu Partner TI. Genera exclusivamente un post para LinkedIn en español, profesional, claro y útil. Respeta el funnel asignado. El copy debe tener entre 160 y 260 palabras, entre 5 y 8 párrafos breves separados por saltos dobles, un solo CTA proporcional al funnel y entre 3 y 5 hashtags al final. No inventes datos, clientes, cifras ni experiencias. El visual_prompt debe tener entre 60 y 100 palabras y estar escrito completamente en inglés, con sujeto, composición, entorno, iluminación, estilo y paleta deep blue #003366 y white; sin texto, números, interfaces legibles ni logos. Devuelve únicamente JSON válido con las claves funnel, titulo, copy, visual_prompt y cta.' }, { role: 'user', content: `Funnel obligatorio: ${$json.funnel_target}\\nTítulo de la noticia: ${$json.title ?? ''}\\nResumen: ${$json.original_content_snippet ?? $json.contentSnippet ?? ''}\\nEnlace: ${$json.link ?? ''}` } ] }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        992,
+        96
+      ],
+      "id": "9fd14039-c5a7-4c30-b0d1-e880ff2d70b9",
+      "name": "OpenAI contingencia",
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPEN_AI_API_CREDENTIAL_ID",
+          "name": "openAiApi credential"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Validar respuesta IA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Autorizar contingencia OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Autorizar contingencia OpenAI": {
+      "main": [
+        [
+          {
+            "node": "OpenAI contingencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI contingencia": {
+      "main": [
+        [
+          {
+            "node": "Validar respuesta IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar respuesta IA": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Read2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Seleccionar lote editorial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Seleccionar lote editorial": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "999f67f0-5908-4b57-aa55-f829fb5dd998",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "58aed0187b4e7751f4708e4f341d14e330cdb1cff276877f999a6b7d3b607edf"
+  },
+  "id": "YSborGBEHnA5iFW9",
+  "tags": []
+}

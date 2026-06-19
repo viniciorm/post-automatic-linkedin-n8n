@@ -1,0 +1,373 @@
+{
+  "name": "Tu Partner TI - Workflow A (Ideador)",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "YOUR_SPREADSHEET_ID"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "ID",
+              "fieldValue": "={{ $now.toFormat('yyyyMMddHHmm') }}"
+            },
+            {
+              "fieldId": "Etapa Funnel",
+              "fieldValue": "={{ JSON.parse($json.output).funnel }}"
+            },
+            {
+              "fieldId": "Tema / Título",
+              "fieldValue": "={{ JSON.parse($json.output).titulo }}"
+            },
+            {
+              "fieldId": "Tipo de Post",
+              "fieldValue": "={{ JSON.parse($json.output).post_type }}"
+            },
+            {
+              "fieldId": "Copy Sugerido",
+              "fieldValue": "={{ JSON.parse($json.output).copy }}"
+            },
+            {
+              "fieldId": "Prompt Visual",
+              "fieldValue": "={{ JSON.parse($json.output).visual_prompt }}"
+            },
+            {
+              "fieldId": "CTA",
+              "fieldValue": "={{ JSON.parse($json.output).cta }}"
+            },
+            {
+              "fieldId": "Estado",
+              "fieldValue": "PENDIENTE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        896,
+        112
+      ],
+      "id": "e864cc28-095a-4545-96de-d83e63b084db",
+      "credentials": {
+        "googleApi": {
+          "id": "YOUR_GOOGLE_API_CREDENTIAL_ID",
+          "name": "googleApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        544,
+        112
+      ],
+      "id": "01961fe9-2e81-4fb4-ad14-62bd8e9715ad",
+      "name": "Groq Chat Model",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "groqApi": {
+          "id": "YOUR_GROQ_API_CREDENTIAL_ID",
+          "name": "groqApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Actúa como Director Creativo de \"Tu Partner TI\". Tu misión es transformar noticias en contenido estratégico.\n\nREGLAS DE GENERACIÓN:\n1. Variedad de Funnel: No te quedes solo en MOFU. Si la noticia es tendencia, úsala como TOFU (atracción). Si habla de soluciones, úsala como BOFU (venta).\n2. Coherencia Visual (CRÍTICO): \n   - Si el 'post_type' es \"Reel\", el 'visual_prompt' DEBE describir movimiento (ej: \"Cámara en travelling\", \"partículas de datos fluyendo\", \"transiciones dinámicas\"). \n   - Si es \"Post\", describe una composición estática y editorial.\n3. Identidad: Usa siempre azul profundo (#003366) y blanco.\n\nREGLA DE FORMATO:\nResponde ÚNICAMENTE en JSON plano.\n\nESTRUCTURA:\n{\n  \"funnel\": \"TOFU, MOFU o BOFU\",\n  \"titulo\": \"Título con gancho\",\n  \"post_type\": \"Alterna entre: Reel, Post, Historia\",\n  \"copy\": \"Texto para el pie de foto\",\n  \"visual_prompt\": \"Descripción técnica para Freepik Spaces (Si es Reel, describe movimiento y cinemática)\",\n  \"cta\": \"Llamado a la acción\"\n}\n\nNOTICIA:\n{{ $json.contentSnippet }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        544,
+        -96
+      ],
+      "id": "18c4ca8c-a6dc-4121-947c-fc1183f13abd",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 12 * * 1-7"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -448,
+        32
+      ],
+      "id": "08c4b3f6-9235-48cb-9943-6c25753173b3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://techcrunch.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -112
+      ],
+      "id": "7cf1ae07-bf38-4661-aafd-fa5b50dddde9",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "url": "https://www.wired.com/feed/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        32
+      ],
+      "id": "d6acabd0-67bb-4ee1-b1ac-3f1221971b59",
+      "name": "RSS Read1"
+    },
+    {
+      "parameters": {
+        "url": "https://www.theverge.com/rss/index.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        192
+      ],
+      "id": "9c2180fc-a9f2-481d-b2da-dc48c7b128f9",
+      "name": "RSS Read2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        128,
+        32
+      ],
+      "id": "0225dc42-0ba1-465f-9d9d-27f149470094",
+      "name": "Loop Over Items",
+      "executeOnce": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        304,
+        48
+      ],
+      "id": "30b949b5-4156-4ec3-9790-391aef1d1582"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        112
+      ],
+      "id": "7df6ec1c-2853-4c96-9312-8ac150429dac",
+      "name": "Wait",
+      "webhookId": "7a829fcf-2361-48f6-afdb-e8e00df2df26"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -64,
+        16
+      ],
+      "id": "a0216d72-037a-48af-bc09-73acf8b857df",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS Read2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS Read2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "999f67f0-5908-4b57-aa55-f829fb5dd998",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "58aed0187b4e7751f4708e4f341d14e330cdb1cff276877f999a6b7d3b607edf"
+  },
+  "id": "YSborGBEHnA5iFW9",
+  "tags": []
+}

@@ -1,0 +1,31 @@
+# Dependencies and builds
+node_modules/
+dist/
+web/node_modules/
+web/dist/
+web/.npm-cache/
+
+# Local environment
+.env
+.env.*
+!.env.example
+*.local
+
+# Credentials and secrets
+*service-account*.json
+*service_account*.json
+*-credentials.json
+*-credential.json
+*gservi*.json
+
+# Generated output
+graphify-out/
+design-comparison.png
+
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.antigravity/
+web/AGENTS.md

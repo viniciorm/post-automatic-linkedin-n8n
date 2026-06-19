@@ -1,0 +1,234 @@
+{
+  "name": "Workflow B (Publicador LinkedIn - Organización)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hour"
+            }
+          ]
+        }
+      },
+      "id": "0dcfc505-dd67-4a69-9c0f-e751ef38c1bb",
+      "name": "Cada hora",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        960,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "column": "Estado",
+              "value": "APROBADO"
+            },
+            {
+              "column": "RRSS",
+              "value": "LinkedIn"
+            },
+            {
+              "column": "Fecha Publicacion",
+              "value": "={{ $now.toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cecc5edb-ee5f-4663-a10c-2504016ad2a0",
+      "name": "Get Pending Posts - LinkedIn Organización",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1184,
+        432
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "YOUR_GOOGLE_API_CREDENTIAL_ID",
+          "name": "googleApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "huggingFaceApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "image/jpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\"inputs\": $json[\"Prompt Visual\"]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "28e3abb3-9a80-4088-968f-67418d666ee6",
+      "name": "Generar imagen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1408,
+        432
+      ],
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "YOUR_HUGGING_FACE_API_CREDENTIAL_ID",
+          "name": "huggingFaceApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "YOUR_LINKEDIN_ORGANIZATION_ID",
+        "text": "={{ $('Get Pending Posts - LinkedIn Organización').item.json['Copy Sugerido'] }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "088f7bcd-c3ae-4a50-9474-af67a3a463e2",
+      "name": "Publicar en organización LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        432
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKED_IN_OAUTH2API_CREDENTIAL_ID",
+          "name": "linkedInOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Get Pending Posts - LinkedIn Organización').item.json.ID }}",
+            "Estado": "PUBLICADO"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "e85328f1-b23a-42f9-bb37-986ca618d194",
+      "name": "Marcar como PUBLICADO",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1856,
+        432
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_OAUTH2API_CREDENTIAL_ID",
+          "name": "googleSheetsOAuth2Api credential"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cada hora": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Posts - LinkedIn Organización",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending Posts - LinkedIn Organización": {
+      "main": [
+        [
+          {
+            "node": "Generar imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar imagen": {
+      "main": [
+        [
+          {
+            "node": "Publicar en organización LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar en organización LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Marcar como PUBLICADO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timezone": "America/Santiago"
+  },
+  "tags": []
+}

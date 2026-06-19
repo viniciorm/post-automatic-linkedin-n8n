@@ -1,0 +1,362 @@
+{
+  "name": "Workflow B (Publicador LinkedIn)",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "options": {},
+        "operation": "read"
+      },
+      "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+      "name": "Get Pending Posts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1184,
+        640
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "YOUR_GOOGLE_API_CREDENTIAL_ID",
+          "name": "googleApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hour"
+            }
+          ]
+        }
+      },
+      "id": "0413e84a-b881-4ef9-a214-e6734fa5cac1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        976,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "person": "qMfOoqmm1d",
+        "text": "={{ $('Get Pending Posts').item.json['Copy Sugerido'] }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "8d74670b-52bf-4884-b293-afa43498ee77",
+      "name": "Publicar en LinkedIn Personal",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        640
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKED_IN_OAUTH2API_CREDENTIAL_ID",
+          "name": "linkedInOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Santiago', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());\nconst date = Object.fromEntries(parts.map(({ type, value }) => [type, value]));\nconst today = `${date.year}-${date.month}-${date.day}`;\nconst allowedDestinations = new Set(['Personal', 'Organizacion']);\n\nconst normalizeDate = (value) => {\n  const raw = String(value ?? '').trim();\n  const local = raw.match(/^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/);\n\n  if (local) {\n    const [, day, month, year] = local;\n    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;\n  }\n\n  return raw.slice(0, 10);\n};\n\nreturn items.filter(({ json }) =>\n  String(json.Estado ?? '').trim().toUpperCase() === 'APROBADO' &&\n  String(json.RRSS ?? '').trim().toLowerCase() === 'linkedin' &&\n  normalizeDate(json['Fecha Publicacion']) === today &&\n  allowedDestinations.has(String(json['Destino LinkedIn'] ?? '').trim())\n);"
+      },
+      "id": "e4b60be9-07b7-45c7-a034-abcc37945ad7",
+      "name": "Filtrar posts aprobados",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "64179336-c0cd-41f1-a200-4c8bed5fd0b7",
+                    "leftValue": "={{ $('Get Pending Posts').item.json['Destino LinkedIn'] }}",
+                    "rightValue": "Personal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Personal"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "787836c4-e73d-4b20-bc73-cba01d906acb",
+                    "leftValue": "={{ $('Get Pending Posts').item.json['Destino LinkedIn'] }}",
+                    "rightValue": "Organizacion",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Organizacion"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "954556ba-b37e-4566-a3f3-facc4e358cd9",
+      "name": "Enrutar destino LinkedIn",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1776,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "YOUR_LINKEDIN_ORGANIZATION_ID",
+        "text": "={{ $('Get Pending Posts').item.json['Copy Sugerido'] }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "6d68ea87-4ddd-47d3-b9de-dbde42c102a6",
+      "name": "Publicar en LinkedIn Organizacion",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        752
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKED_IN_OAUTH2API_CREDENTIAL_ID",
+          "name": "linkedInOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "huggingFaceApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "image/jpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\"inputs\": $json[\"Prompt Visual\"]}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1568,
+        640
+      ],
+      "id": "2e5fd294-3b16-47ab-ab4b-bfbbe9b63011",
+      "name": "HTTP Request",
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "YOUR_HUGGING_FACE_API_CREDENTIAL_ID",
+          "name": "huggingFaceApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Get Pending Posts').item.json.ID }}",
+            "Estado": "PUBLICADO"
+          },
+          "matchingColumns": [
+            "ID"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1984,
+        640
+      ],
+      "id": "7a01c2a3-810a-46a9-84ab-4adbb0da5799",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_OAUTH2API_CREDENTIAL_ID",
+          "name": "googleSheetsOAuth2Api credential"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Pending Posts": {
+      "main": [
+        [
+          {
+            "node": "Filtrar posts aprobados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar en LinkedIn Personal": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar posts aprobados": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publicar en LinkedIn Organizacion": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Enrutar destino LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrutar destino LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Publicar en LinkedIn Personal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publicar en LinkedIn Organizacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timezone": "America/Santiago"
+  },
+  "versionId": "2b7efe0d-3fd0-4536-9091-1165323adfa7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "58aed0187b4e7751f4708e4f341d14e330cdb1cff276877f999a6b7d3b607edf"
+  },
+  "id": "oizST5M6wHh3QdPP",
+  "tags": []
+}

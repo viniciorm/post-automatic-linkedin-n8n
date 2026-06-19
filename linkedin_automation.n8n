@@ -1,0 +1,255 @@
+{
+  "updatedAt": "2026-03-25T17:50:58.962Z",
+  "createdAt": "2026-03-24T15:18:32.924Z",
+  "id": "oizST5M6wHh3QdPP",
+  "name": "LinkedIn Automation with AI Images",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d",
+      "name": "Get Pending Posts",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        848,
+        752
+      ],
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "YOUR_GOOGLE_API_CREDENTIAL_ID",
+          "name": "googleApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "prompt": "=Actúa como un experto en crear imágenes por IA. Escribe un prompt muy descriptivo y visual (EN INGLÉS) para el modelo Flux.1-schnell, basado en este texto de LinkedIn: {{ $json.Content }}\n",
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "6e006fc6-d70c-41b4-81b6-a7930706e8f4",
+      "name": "Generate Image Prompt1",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        752
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPEN_AI_API_CREDENTIAL_ID",
+          "name": "openAiApi credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hour"
+            }
+          ]
+        }
+      },
+      "id": "0413e84a-b881-4ef9-a214-e6734fa5cac1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        640,
+        752
+      ]
+    },
+    {
+      "parameters": {
+        "person": "qMfOoqmm1d",
+        "text": "=={{ $('Get Pending Posts').item.json.Content }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "8d74670b-52bf-4884-b293-afa43498ee77",
+      "name": "Post to LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        752
+      ],
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "YOUR_LINKED_IN_OAUTH2API_CREDENTIAL_ID",
+          "name": "linkedInOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": "YOUR_SPREADSHEET_ID",
+        "sheetName": "LinkedIn Posts",
+        "options": {}
+      },
+      "id": "17900928-816a-419c-ad95-91715f1691a2",
+      "name": "Update Status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        1840,
+        752
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_OAUTH2API_CREDENTIAL_ID",
+          "name": "googleSheetsOAuth2Api credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.HUGGINGFACE_API_TOKEN }}"
+            },
+            {
+              "name": "Accept",
+              "value": "image/jpeg"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\"inputs\": $json.text}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1232,
+        752
+      ],
+      "id": "2e5fd294-3b16-47ab-ab4b-bfbbe9b63011",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Get Pending Posts": {
+      "main": [
+        [
+          {
+            "node": "Generate Image Prompt1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image Prompt1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Update Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Post to LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ae3d63a2-e392-4e75-a885-05c2e79db139",
+  "activeVersionId": null,
+  "versionCounter": 172,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-03-24T15:18:32.936Z",
+      "createdAt": "2026-03-24T15:18:32.936Z",
+      "role": "workflow:owner",
+      "workflowId": "oizST5M6wHh3QdPP",
+      "projectId": "ehLaA1iFxTdyufd3",
+      "project": {
+        "updatedAt": "2026-02-26T00:27:56.351Z",
+        "createdAt": "2026-02-26T00:24:14.973Z",
+        "id": "ehLaA1iFxTdyufd3",
+        "name": "Vinicio Reyes <marcos.reyes.m@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "96219b26-92aa-45f8-866b-6275e4966295"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}

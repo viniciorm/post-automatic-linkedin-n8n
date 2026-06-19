@@ -1,0 +1,103 @@
+Mientras muchas personas hablan de cómo la IA reemplazará empleos, Anthropic acaba de lanzar una iniciativa que apunta en la dirección contraria.
+
+Se trata de Claude Corps, un programa de becas remuneradas que busca formar y desplegar a 1.000 jóvenes en organizaciones sin fines de lucro para ayudarlas a implementar soluciones basadas en IA. Los seleccionados recibirán capacitación, mentoría y una remuneración anual de USD 85.000.
+
+Lo que más me llamó la atención es quiénes pueden postular:
+✅ Mayores de 18 años
+✅ Menos de 2 años de experiencia laboral full-time
+✅ No se requiere título universitario
+✅ No se requiere experiencia formal en programación
+✅ Ya utilizan herramientas de IA en su día a día y tienen interés en generar impacto social
+✅ Autorización para trabajar en Estados Unidos
+
+Como vemos, está orientado a estudiantes, recién egresados, autodidactas y jóvenes profesionales que han comenzado a incorporar IA en su trabajo o proyectos personales.
+
+Más allá de la oportunidad específica, creo que envía una señal importante de que el mercado está empezando a valorar la capacidad de trabajar con IA aplicada a problemas reales por sobre credenciales tradicionales. En lo personal, es algo con lo que me identifico mucho ya que gran parte de lo que he aprendido ha sido a través de la práctica, la curiosidad y la experimentación constante con nuevas tecnologías. Por eso me parece especialmente interesante ver iniciativas que ponen más énfasis en las habilidades y el impacto que en las credenciales formales.
+
+📖 Más información:
+https://lnkd.in/di6vYr8r
+
+Si iniciativas como Claude Corps demuestran resultados positivos, es probable que más organizaciones y empresas comiencen a apostar por programas que formen talento joven en IA aplicada.
+
+Y la pregunta es:
+¿Creen que en LATAM veremos programas similares durante este año?
+
+#InteligenciaArtificial #IA #Anthropic #Claude #Empleabilidad #TransformacionDigital #JovenesProfesionales #CareerGrowth #AI
+
+
+Comparto esta invitación de la Comunidad IA LATAM para el Congreso IA-LATAM 2026.
+
+Un evento online y gratuito que reunirá charlas y experiencias sobre LLMs, agentes, RAG, IA aplicada y otras tendencias que están transformando la forma en que trabajamos y creamos tecnología.
+
+Si les interesa la IA, vale la pena revisarlo.
+
+Y si tienen una idea, charla, paper o caso de uso real para compartir, la convocatoria de ponentes sigue abierta.
+
+#IA #InteligenciaArtificial #ComunidadIALatam
+
+
+Una de las preguntas que más se repite cuando hablamos de Inteligencia Artificial es:
+
+“¿Por dónde empiezo a formarme de verdad?”
+
+Y la verdad es que hoy el problema no es la falta de cursos o certificaciones.
+El problema es el exceso de opciones, poca claridad y mucho ruido.
+
+Por eso me pareció muy valioso este recurso:
+
+https://lnkd.in/d9PxF68b
+
+Es un catálogo de certificaciones de IA que reúne opciones de distintas entidades, categorías y niveles, desde fundamentos hasta áreas más avanzadas como GenAI, MLOps, seguridad, gobernanza y negocio.
+
+Lo interesante no es solo la lista, sino el criterio de orden:
+permite mirar la formación en IA como una ruta, no como una colección de cursos sueltos.
+
+Creo que este tipo de iniciativas ayudan mucho a quienes estamos tratando de aprender, aplicar y construir con IA desde Latinoamérica, con una mirada más práctica y menos dispersa.
+
+Felicitaciones a Comunidad IA LATAM por impulsar este tipo de espacios y a Sebastián Vargas 🌿 por centralizar y ordenar estos recursos.
+
+Lo comparto porque puede servirle a profesionales, docentes, emprendedores, equipos TI y personas que están buscando una forma más clara de avanzar en IA.
+
+¿Cuál certificación o ruta recomendarían para alguien que quiere pasar de usar IA a implementarla en procesos reales?
+
+#InteligenciaArtificial #ComunidadIALatam #AprendizajeContinuo #TransformacionDigital #IA #Certificaciones #Latam
+
+
+
+Este año decidí dar un paso más en algo que vengo construyendo hace tiempo: aportar activamente al ecosistema de IA en Chile.
+
+Desde enero, Tu Partner TI es empresa asociada de la Cámara Chilena de Inteligencia Artificial (CCHIA).
+
+Para mí, esto no es solo un hito institucional. Es una responsabilidad.
+
+Creo profundamente que la Inteligencia Artificial debe ayudarnos a tener una mejor calidad de vida.
+
+Y eso significa algo concreto:
+- que las pymes puedan ser más eficientes y competitivas
+- que los emprendedores accedan a herramientas que antes eran exclusivas de grandes empresas
+- que el sector educativo forme personas que entiendan y utilicen la IA con criterio
+- que la tecnología potencie la cultura, la creatividad y la innovación
+- que la automatización libere tiempo para enfocarnos en lo realmente importante
+
+No veo la IA como una moda.
+La veo como una herramienta para reducir brechas, generar oportunidades y construir un Chile más colaborativo.
+
+Creo en el trabajo en red.
+Creo en la colaboración entre empresas, academia y sector público.
+Y quiero aportar desde la práctica, no solo desde el discurso.
+
+Si estás trabajando en IA aplicada, educación, innovación o transformación digital en Chile, conversemos.
+
+
+
+
+Hoy cierro una meta que me propuse hace un tiempo: completar el Máster de Inteligencia Artificial de BIG school.
+Más allá del certificado, este proceso tuvo un significado especial para mí. En un mundo donde muchas veces la experiencia práctica parece no ser suficiente, sentí la necesidad de cimentar y respaldar conocimientos que ya venía aplicando en proyectos de automatización, transformación digital, productos digitales e inteligencia artificial.
+Quiero agradecer especialmente a Paola, quien fue fundamental para tomar la decisión de iniciar este desafío. Su apoyo, confianza y compañía fueron claves para mantener el rumbo y cumplir el objetivo en el plazo que me había propuesto.
+También me llevo algo igual de valioso que el aprendizaje: las personas que conocí durante el programa. Compartir experiencias, desafíos e ideas con profesionales de distintas áreas fue una de las mejores partes de este camino.
+Hoy recibo este reconocimiento con mucha alegría, pero sobre todo con la sensación de que esto no es un punto de llegada, sino el comienzo de muchas cosas buenas que vienen por delante.
+Gracias a BIG School, a los profesores, compañeros y a todos quienes fueron parte de este proceso.
+
+Seguimos aprendiendo, construyendo y transformando ideas en realidad.
+
+hashtag#InteligenciaArtificial hashtag#TransformacionDigital hashtag#Innovacion hashtag#IA hashtag#AprendizajeContinuo hashtag#BIGSchool
