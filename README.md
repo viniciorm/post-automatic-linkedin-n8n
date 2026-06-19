@@ -30,7 +30,7 @@ El contenido avanza por cuatro estados: `GENERAR` → `REVISANDO` → `APROBADO`
 
 | Archivo | Propósito |
 | --- | --- |
-| `Tu_Partner_TI_Workflow_A_Ideador_V2.json` | Genera contenido corporativo desde RSS. |
+| `Workflow_A_Ideador_Empresa.json` | Genera contenido corporativo desde RSS. |
 | `Workflow_B_Publicador_LinkedIn.json` | Publica contenido corporativo aprobado. |
 | `Workflow_C_Ideador_Publicador_Personal.json` | Genera y publica contenido personal. |
 

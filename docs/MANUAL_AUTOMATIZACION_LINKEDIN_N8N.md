@@ -36,7 +36,7 @@ flowchart LR
 
 | Workflow | Archivo | Función |
 | --- | --- | --- |
-| Ideador de empresa | `Tu_Partner_TI_Workflow_A_Ideador_V2.json` | Lee noticias, genera el contenido corporativo y lo guarda para revisión. |
+| Ideador de empresa | `Workflow_A_Ideador_Empresa.json` | Lee noticias, genera el contenido corporativo y lo guarda para revisión. |
 | Publicador de empresa | `Workflow_B_Publicador_LinkedIn.json` | Lee filas aprobadas y las dirige al perfil personal o a la organización. |
 | Ideador y publicador personal | `Workflow_C_Ideador_Publicador_Personal.json` | Convierte ideas propias en borradores con voz personal y publica los aprobados. |
 
@@ -332,7 +332,7 @@ No se debe usar `APROBADO` como estado de prueba si no se está dispuesto a publ
 | `publicaciones_linkedin_vini_reyes.txt` | Muestras utilizadas para analizar la voz. |
 | `Workflow_C_Ideador_Publicador_Personal.json` | Workflow personal actualizado. |
 | `Workflow_B_Publicador_LinkedIn.json` | Publicador con rutas personal y organización. |
-| `Tu_Partner_TI_Workflow_A_Ideador_V2.json` | Ideador de contenido empresarial. |
+| `Workflow_A_Ideador_Empresa.json` | Ideador de contenido empresarial. |
 
 ## 12. Pendientes conocidos
 
