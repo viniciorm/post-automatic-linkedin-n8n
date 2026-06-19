@@ -1,6 +1,6 @@
 # Manual de automatización de LinkedIn con n8n
 
-> Documento vivo. Resume la implementación, las pruebas y los errores encontrados hasta el 18 de junio de 2026. Debe actualizarse a medida que evolucione la solución.
+> Documento vivo. Resume la implementación, las pruebas y los errores encontrados hasta el 19 de junio de 2026. Debe actualizarse a medida que evolucione la solución.
 
 ## 1. Objetivo
 
@@ -308,6 +308,16 @@ Cuando se autoriza, `OpenAI contingencia` utiliza `gpt-4.1-mini` con una credenc
 
 Se probó un Quick Tunnel de Cloudflare para OAuth y luego se eliminó. El contenedor original quedó restaurado en `http://localhost:5678`.
 
+### 9.13. Groq devolvía JSON inválido en el copy personal
+
+**Síntomas:** el nodo `Parsear copy personal` fallaba con `Bad control character in string literal` o con `Unexpected non-whitespace character after JSON`.
+
+**Causas:** el modelo podía incluir saltos de línea sin escapar dentro de `copy` o agregar Markdown y explicaciones después del objeto JSON válido.
+
+**Solución:** el nodo ahora localiza el primer objeto JSON completo mediante balanceo de llaves, ignora cualquier contenido posterior y escapa retornos, tabulaciones y saltos de línea que aparezcan dentro de strings. Después valida que `copy` exista antes de aplicar el formateador para LinkedIn. El código fuente del nodo también se conserva en `scripts/nodes/parsear-copy-personal.js`.
+
+**Comprobación:** al ejecutar la generación, `Parsear copy personal` debe devolver `copy` y `visual_prompt`; la fila cambia a `REVISANDO`. Si Groq no entrega un objeto completo o no incluye un copy válido, el flujo se detiene con un error descriptivo antes de guardar o publicar.
+
 ## 10. Operación segura
 
 Antes de activar un workflow:
@@ -356,6 +366,12 @@ No se debe usar `APROBADO` como estado de prueba si no se está dispuesto a publ
 - Exportar workflows sin datos de ejecución ni valores sensibles.
 
 ## 14. Registro de cambios
+
+### 2026-06-19
+
+- Se robusteció `Parsear copy personal` para aceptar saltos de línea sin escapar y descartar texto añadido después del JSON de Groq.
+- Se añadieron validaciones explícitas para respuestas incompletas o sin `copy`.
+- Se documentó el código del nodo en `scripts/nodes/parsear-copy-personal.js` para facilitar mantenimiento y copia manual.
 
 ### 2026-06-18
 
