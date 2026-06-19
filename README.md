@@ -2,6 +2,8 @@
 
 Sistema open source para idear, revisar, programar y publicar contenido en LinkedIn con **n8n**, Google Sheets e IA. Mantiene una aprobación humana deliberada: la IA prepara el borrador y una persona decide qué se publica.
 
+**[Abrir la documentación web](https://viniciorm.github.io/post-automatic-linkedin-n8n/)**
+
 ## Qué incluye
 
 - Ideador corporativo a partir de noticias RSS.
