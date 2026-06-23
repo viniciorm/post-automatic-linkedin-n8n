@@ -12,7 +12,6 @@ import {
   PaperPlaneTilt,
   Rss,
   Robot,
-  SidebarSimple,
   Sparkle,
   Table,
   UserCircleCheck,
@@ -31,10 +30,12 @@ const chapters = [
   ['voz-personal-y-formato-editorial', '8. Voz editorial'],
   ['errores-encontrados-y-soluciones', '9. Errores y soluciones'],
   ['operacion-segura', '10. Operación segura'],
-  ['archivos-del-proyecto', '11. Archivos'],
-  ['pendientes-conocidos', '12. Pendientes'],
-  ['lista-de-seguridad-antes-de-publicar-el-proyecto', '13. Seguridad'],
-  ['registro-de-cambios', '14. Cambios'],
+  ['migracion-a-n8n-en-vps', '11. Migración VPS'],
+  ['asistente-editorial-por-telegram', '12. Telegram'],
+  ['archivos-del-proyecto', '13. Archivos'],
+  ['pendientes-conocidos', '14. Pendientes'],
+  ['lista-de-seguridad-antes-de-publicar-el-proyecto', '15. Seguridad'],
+  ['registro-de-cambios', '16. Cambios'],
 ]
 
 const slug = (value) => value
@@ -161,7 +162,7 @@ function App() {
         </div>
         <div className="progress-block">
           <span>DOCUMENTACIÓN</span>
-          <strong>14 capítulos</strong>
+          <strong>{chapters.length} capítulos</strong>
           <div className="progress"><i style={{ width: `${((chapters.findIndex(([id]) => id === active) + 1) / chapters.length) * 100}%` }} /></div>
         </div>
         <nav aria-label="Capítulos del manual">
@@ -182,7 +183,7 @@ function App() {
 
       <main id="top">
         <section className="hero">
-          <div className="eyebrow"><BookOpenText size={17} /> Manual de implementación · Actualizado el 18 de junio de 2026</div>
+          <div className="eyebrow"><BookOpenText size={17} /> Manual de implementación · Actualizado el 22 de junio de 2026</div>
           <h1>Automatiza tus publicaciones<br />en LinkedIn con n8n</h1>
           <p>Una guía práctica para generar, revisar y publicar contenido con aprobación humana en el punto justo.</p>
         </section>
@@ -218,7 +219,7 @@ function App() {
           <article className="manual-content" dangerouslySetInnerHTML={{ __html: content }} />
           <aside className="on-page">
             <span>EN ESTA GUÍA</span>
-            {chapters.slice(0, 8).map(([id, label]) => <button key={id} className={active === id ? 'active' : ''} onClick={() => jumpTo(id)}>{label}</button>)}
+            {chapters.slice(0, 12).map(([id, label]) => <button key={id} className={active === id ? 'active' : ''} onClick={() => jumpTo(id)}>{label}</button>)}
           </aside>
         </div>
 
