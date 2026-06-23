@@ -332,7 +332,83 @@ Antes de activar un workflow:
 
 No se debe usar `APROBADO` como estado de prueba si no se está dispuesto a publicar realmente.
 
-## 11. Archivos del proyecto
+## 11. Migración a n8n en VPS
+
+La instancia de producción utiliza `https://n8n.tupartnerti.cl`. Los IDs de Google Sheets no cambian durante la migración; las credenciales OAuth sí deben volver a autorizarse en la nueva instancia.
+
+### 11.1. Proxy confiable y WebSocket
+
+Cuando existe un proxy inverso se debe configurar `N8N_PROXY_HOPS=1`. Sin esta variable puede aparecer `ERR_ERL_UNEXPECTED_X_FORWARDED_FOR`.
+
+El bloque Nginx debe conservar la conexión WebSocket:
+
+```nginx
+location / {
+    proxy_pass http://localhost:5678;
+    proxy_http_version 1.1;
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Si falta `Upgrade` o se configura `Connection ''`, el editor muestra `Lost connection to the server` aunque `/healthz` responda correctamente. Después de modificar Nginx se debe ejecutar `nginx -t` y, sólo si la validación es correcta, `systemctl reload nginx`.
+
+### 11.2. Google OAuth
+
+La URI autorizada debe coincidir exactamente con:
+
+```text
+https://n8n.tupartnerti.cl/rest/oauth2-credential/callback
+```
+
+`redirect_uri_mismatch` indica que falta esa URI en Google Cloud. `invalid_client` normalmente indica que el Client ID y el Client Secret no pertenecen al mismo cliente OAuth o que el secreto fue regenerado.
+
+## 12. Asistente editorial por Telegram
+
+El workflow de producción `Asistente editorial por Telegram` permite ingresar ideas sin editar directamente Google Sheets.
+
+### 12.1. Conversación
+
+1. Enviar `/nueva`.
+2. Indicar `Idea Base`.
+3. Indicar `Mi Opinion`, o `-` cuando no corresponda.
+4. Indicar `Experiencia`, o `-` cuando no corresponda.
+5. Indicar `Objetivo`.
+6. Elegir o escribir `TEXTO` o `IMAGEN`.
+7. Indicar `Fecha Publicacion` en formato `DD/MM/AAAA`.
+8. Revisar el copy y, cuando corresponda, la imagen.
+9. Elegir `Aprobar`, `Regenerar` o `Descartar`.
+
+Al aprobar, el workflow agrega una fila a `Ideas Personales` con estado `APROBADO`. El workflow personal programado consulta la hoja cada hora y publica cuando la fecha coincide con el día actual.
+
+### 12.2. Operación y credenciales
+
+- `/start` o `/ayuda`: muestra instrucciones.
+- `/nueva`: inicia una conversación.
+- `/cancelar`: elimina la conversación pendiente.
+- `Aprobar`: guarda la propuesta como `APROBADO`.
+- `Regenerar`: crea otra versión con los mismos datos.
+- `Descartar`: cancela la propuesta.
+
+El workflow debe estar publicado y activo. El estado de conversación no se conserva correctamente entre mensajes cuando el Telegram Trigger se ejecuta sólo en modo manual.
+
+El token de BotFather se guarda como credencial nativa de Telegram en n8n. No debe escribirse en nodos Code, exportarse al repositorio ni aparecer en capturas. Un bot admite un único webhook activo, por lo que no debe usarse simultáneamente en dos instancias o triggers.
+
+### 12.3. Limitación actual de las imágenes
+
+Telegram genera una imagen para la vista previa, pero al aprobar sólo guarda `Prompt Visual` en Google Sheets. Cuando llega la fecha, el publicador genera una imagen nueva desde ese prompt. Por ello, la imagen publicada puede diferir de la aprobada.
+
+La mejora pendiente consiste en guardar la imagen aprobada en el volumen persistente `/files`, asociarla al `ID` y hacer que el publicador lea ese archivo. Hasta implementar y comprobar esa persistencia, aprobar una vista previa no garantiza una imagen idéntica en LinkedIn.
+
+## 13. Archivos del proyecto
 
 | Archivo | Propósito |
 | --- | --- |
@@ -344,10 +420,12 @@ No se debe usar `APROBADO` como estado de prueba si no se está dispuesto a publ
 | `Workflow_B_Publicador_LinkedIn.json` | Publicador con rutas personal y organización. |
 | `Workflow_A_Ideador_Empresa.json` | Ideador de contenido empresarial. |
 
-## 12. Pendientes conocidos
+## 14. Pendientes conocidos
 
 - Hacer permanente la corrección de versión de la API de LinkedIn.
 - Probar completamente la rama `IMAGEN` del workflow personal.
+- Persistir la imagen aprobada por Telegram y reutilizar exactamente ese archivo al publicar.
+- Exportar y sanitizar el workflow `Asistente editorial por Telegram` después de completar sus pruebas.
 - Revalidar la publicación como organización con sus permisos OAuth.
 - Añadir una columna `Link Publicacion` y guardar automáticamente el enlace devuelto por LinkedIn.
 - Añadir control de idempotencia para impedir publicaciones duplicadas.
@@ -355,7 +433,7 @@ No se debe usar `APROBADO` como estado de prueba si no se está dispuesto a publ
 - Activar los workflows sólo después de completar las pruebas de texto e imagen.
 - Sanitizar archivos y documentación antes de publicar el repositorio.
 
-## 13. Lista de seguridad antes de publicar el proyecto
+## 15. Lista de seguridad antes de publicar el proyecto
 
 - Eliminar cualquier archivo JSON de cuentas de servicio o credenciales.
 - Revocar y reemplazar claves que hayan aparecido en capturas, terminales o commits.
@@ -365,7 +443,14 @@ No se debe usar `APROBADO` como estado de prueba si no se está dispuesto a publ
 - Añadir secretos y archivos locales al `.gitignore`.
 - Exportar workflows sin datos de ejecución ni valores sensibles.
 
-## 14. Registro de cambios
+## 16. Registro de cambios
+
+### 2026-06-22
+
+- Se documentó la migración a n8n en VPS, incluyendo OAuth, proxy confiable y WebSocket en Nginx.
+- Se documentó el asistente editorial por Telegram, sus campos, comandos y aprobación programada.
+- Se registró que el publicador todavía regenera las imágenes desde `Prompt Visual`.
+- Se añadió como pendiente la persistencia y reutilización exacta de la imagen aprobada.
 
 ### 2026-06-19
 
